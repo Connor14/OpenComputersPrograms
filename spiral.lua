@@ -357,8 +357,7 @@ end
 --MODIFIED
 local function costToReturn()
   -- Overestimate a bit, to account for obstacles such as gravel or mobs.
-  --return 5000 + averageMoveCost * distanceToOrigin * 1.25
-  return 5000
+  return 5000 + averageMoveCost * distanceToOrigin * 1.25
 end
 
 -- Checks whether we need maintenance.
@@ -473,7 +472,7 @@ local function gotoMaintenance(force)
   io.write("Going back to main tunnel for maintenance!\n")
   local moves = popMoves()
 
-  --assert(distanceToOrigin == 0)
+  assert(distanceToOrigin == 0)
 
   dropMinedBlocks()
   checkTool()
@@ -593,6 +592,7 @@ end
 -- POST: at the end of the tunnel.
 local function dig1x2(length, exhaustive)
   moves = {}
+  distanceToOrigin = 0
   while length > 0 and move(sides.forward) do
     dig(sides.up, gotoMaintenance)
     digVeins(exhaustive)
