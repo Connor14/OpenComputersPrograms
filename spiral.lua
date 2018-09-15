@@ -464,15 +464,36 @@ local function gotoMaintenance(force)
   end
 
   -- Save some values for later, temporarily remove onMove callback.
+  local returnCost = costToReturn()
   local moveCallback = onMove
   onMove = nil
 
-  io.write("Setting up maintenance!\n")
+  local top, count = getTop()
+
+  io.write("Going back to main tunnel for maintenance!\n")
+  local moves = popMoves()
+
+  assert(distanceToOrigin == 0)
 
   dropMinedBlocks()
   checkTool()
   checkTorches()
   recharge() -- Last so we can charge some during the other operations.
+
+  if moves and #moves > 0 then
+    if returnCost * 2 > computer.maxEnergy() and
+       not options.f and
+       not prompt("Going back will cost me half my energy. There's a good chance I will not return. Do you want to send me to my doom anyway?")
+    then
+      os.exit()
+    end
+    io.write("Returning to where I left off.\n")
+    pushMoves(moves)
+  end
+
+  local newTop, newCount = getTop()
+  assert(top == newTop)
+  assert(count == newCount)
 
   onMove = moveCallback
 end
@@ -571,6 +592,7 @@ end
 -- PRE: bottom front of tunnel to dig.
 -- POST: at the end of the tunnel.
 local function dig1x2(length, exhaustive)
+  moves = {}
   while length > 0 and move(sides.forward) do
     dig(sides.up, gotoMaintenance)
     digVeins(exhaustive)
