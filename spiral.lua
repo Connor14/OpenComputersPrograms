@@ -473,7 +473,7 @@ local function gotoMaintenance(force)
   io.write("Going back to main tunnel for maintenance!\n")
   local moves = popMoves()
 
-  assert(distanceToOrigin == 0)
+  --assert(distanceToOrigin == 0)
 
   dropMinedBlocks()
   checkTool()
