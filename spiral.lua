@@ -60,7 +60,16 @@ local right = not left
 local keepSlot = {}
 
 -- Slots that we keep torches in, updated when stocking up on torches.
-local torchSlots = {}
+
+local torchChestSlot = 1
+local toolChestSlot = 2
+local oreChestSlot = 3
+local chargerSlot = 4
+local fluxPointSlot = 5
+local toolSlot = 6
+local torchSlot = 7
+
+--local torchSlots = {}
 
 --[[ "Passive" logic ]]--------------------------------------------------------
 
@@ -103,7 +112,8 @@ end
 
 -- Number of stacks of torches to keep; default is 1 per inventory upgrade.
 local function torchStacks()
-  return math.max(1, math.ceil(robot.inventorySize() / 16))
+  --return math.max(1, math.ceil(robot.inventorySize() / 16))
+  return 1
 end
 
 -- Look for the first empty slot in our inventory.
@@ -117,11 +127,12 @@ end
 
 -- Find the first torch slot that still contains torches.
 local function findTorchSlot()
-  for _, slot in ipairs(torchSlots) do
-    if robot.count(slot) > 0 then
-      return slot
-    end
-  end
+  --for _, slot in ipairs(torchSlots) do
+  --  if robot.count(slot) > 0 then
+  --    return slot
+  --  end
+  --end
+  return torchSlot
 end
 
 -- Since robot.select() is an indirect call, we can speed things up a bit.
@@ -369,6 +380,7 @@ end
 
 -- Drops all inventory contents that are not marked for keeping.
 local function dropMinedBlocks()
+  -- place the ore chest above robot
   if component.isAvailable("inventory_controller") then
 	if not component.inventory_controller.getInventorySize(sides.up) then
       io.write("There doesn't seem to be an inventory below me! Waiting to avoid spilling stuffs into the world.\n")
@@ -383,15 +395,18 @@ local function dropMinedBlocks()
     end
   end
   cachedSelect(1)
+  -- remove the ore chest
 end
 
 -- Ensures we have a tool with durability.
 --BUG starts from the first slot (suckUp does this) and only pulls one thing, regardless of the thing.
 local function checkTool()
+  -- place the tool chest above robot
   if not robot.durability() then
     io.write("Tool is broken, getting a new one.\n")
     if component.isAvailable("inventory_controller") then
-      cachedSelect(findEmptySlot()) -- Select an empty slot for working.
+      --cachedSelect(findEmptySlot()) -- Select an empty slot for working.
+	  cachedSelect(toolSlot)
       repeat
         component.inventory_controller.equip() -- Drop whatever's in the tool slot.
         while robot.count() > 0 do
@@ -409,51 +424,66 @@ local function checkTool()
       until robot.durability()
     end
   end
+  
+  --remove the tool chest above robot
 end
 
 -- Ensures we have some torches.
 local function checkTorches()
   -- First, clean up our list and look for empty slots.
   io.write("Getting my fill of torches.\n")
-  local oldTorchSlots = torchSlots
-  torchSlots = {}
-  for _, slot in ipairs(oldTorchSlots) do
-    keepSlot[slot] = nil
-    if robot.count(slot) > 0 then
-      torchSlots[#torchSlots + 1] = slot
-    end
-  end
-  while #torchSlots < torchStacks() do
-    local slot = findEmptySlot()
-    if not slot then
-      break -- This should never happen...
-    end
-    torchSlots[#torchSlots + 1] = slot
-  end
+  --local oldTorchSlots = torchSlots
+  --torchSlots = {}
+  --for _, slot in ipairs(oldTorchSlots) do
+  --  keepSlot[slot] = nil
+  --  if robot.count(slot) > 0 then
+  --    torchSlots[#torchSlots + 1] = slot
+  --  end
+  --end
+  --while #torchSlots < torchStacks() do
+  --  local slot = findEmptySlot()
+  --  if not slot then
+  --    break -- This should never happen...
+  --  end
+  --  torchSlots[#torchSlots + 1] = slot
+  --end
   -- Then fill the slots with torches.
-  for _, slot in ipairs(torchSlots) do
-    keepSlot[slot] = true
-    if robot.space(slot) > 0 then
-      cachedSelect(slot)
-      repeat
-        local before = robot.space()
-        --robot.suck(robot.space())
+  --for _, slot in ipairs(torchSlots) do
+  --  keepSlot[slot] = true
+  
+  -- place the torch chest
+  cachedSelect(torchChestSlot)
+  robot.placeUp()
+	if robot.space(torchSlot) > 0 then
+	  cachedSelect(torchSlot)
+	  repeat
+		local before = robot.space()
+		--robot.suck(robot.space())
 		robot.suckUp(robot.space())
-        if robot.space() == before then
-          os.sleep(5) -- Don't busy idle.
-        end
-      until robot.space() < 1
-      cachedSelect(1)
-    end
-  end
+		if robot.space() == before then
+		  os.sleep(5) -- Don't busy idle.
+		end
+	  until robot.space() < 1
+	  cachedSelect(1)
+	end
+	-- remove the torch chest
+	cachedSelect(torchChestSlot)
+	robot.swingUp()
+	
+  --end
 end
 
 -- Recharge our batteries.
 local function recharge()
+  --place the charger
+  -- place the flux point
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
     os.sleep(1)
   end
+  
+  --remove the flux point
+  -- remove the charger
 end
 
 -- Go back to the docking bay for general maintenance if necessary.
@@ -477,7 +507,7 @@ local function gotoMaintenance(force)
   dropMinedBlocks()
   checkTool()
   checkTorches()
-  recharge() -- Last so we can charge some during the other operations.
+  recharge() -- Last so we can charge some during the other operations above.
 
   if moves and #moves > 0 then
     if returnCost * 2 > computer.maxEnergy() and
@@ -689,5 +719,6 @@ end
 io.write("Run with -h or --help for parameter info.\n")
 
 if options.s or prompt("Shall we begin?") then
-  main(startingEdge, startingSteps)
+  --main(startingEdge, startingSteps)
+  checkTorches()
 end
