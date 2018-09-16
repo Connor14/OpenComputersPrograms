@@ -708,7 +708,7 @@ if not component.isAvailable("inventory_controller") then
 end
 
 io.write("I need the following in the proper slots\n")
-io.write("1: Torch Chest, 2: Tool Chest, 3: Ore Chest, 4: Charger, 5: Flux Point\n")
+io.write("1: Torch Chest\n2: Tool Chest\n3: Ore Chest\n4: Charger\n5: Flux Point\n")
 
 --[[
 local torchChestSlot = 1
