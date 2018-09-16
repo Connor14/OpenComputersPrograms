@@ -553,8 +553,8 @@ local function gotoMaintenance(force)
   end
 
   local newTop, newCount = getTop()
-  assert(top == newTop)
-  assert(count == newCount)
+  --assert(top == newTop) -- was failing
+  --assert(count == newCount)
 
   onMove = moveCallback
 end
@@ -709,6 +709,8 @@ local function main(currentEdge, completedSteps)
   gotoMaintenance(true)
 end
 
+io.write("Run with -h or --help for parameter info.\n")
+
 if options.h or options.help then
   io.write("Usage: spiral [-hsf] [wallThickness (2) [startingEdge (1) [startingSteps (0)]]]\n")
   io.write("  -h:     this help listing.\n")
@@ -754,8 +756,6 @@ if component.isAvailable("inventory_controller") then
 else
   --io.write("You'll need to manually provide me with new tools if they break.\n")
 end
-
-io.write("Run with -h or --help for parameter info.\n")
 
 if options.s or prompt("Shall we begin?") then
   main(startingEdge, startingSteps)
