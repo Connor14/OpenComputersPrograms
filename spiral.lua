@@ -656,7 +656,7 @@ local function dig1x2(length, exhaustive)
   moves = {}
   distanceToOrigin = 0
   io.write("Average Move Cost: " .. averageMoveCost .. "\n")
-  io.write("Return Cost (should be 0 at start): " .. returnCost .. "\n")
+  io.write("Return Cost (should be 0 at start): " .. costToReturn() .. "\n")
   
   while length > 0 and move(sides.forward) do
     dig(sides.up, gotoMaintenance)
