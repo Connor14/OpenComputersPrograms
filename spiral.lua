@@ -61,13 +61,13 @@ local keepSlot = {}
 
 -- Slots that we keep torches in, updated when stocking up on torches.
 
-local torchChestSlot = 1
-local toolChestSlot = 2
+local toolChestSlot = 1
+local torchChestSlot = 2
 local oreChestSlot = 3
 local chargerSlot = 4
 local fluxPointSlot = 5
-local toolSlot = 6
-local torchSlot = 7
+local torchSlot = 6
+local toolSlot = 7
 
 --local torchSlots = {}
 
@@ -118,7 +118,7 @@ end
 
 -- Look for the first empty slot in our inventory.
 local function findEmptySlot()
-  for slot = 8, robot.inventorySize() do
+  for slot = 7, robot.inventorySize() do
     if robot.count(slot) == 0 then
       return slot
     end
@@ -127,12 +127,9 @@ end
 
 -- Find the first torch slot that still contains torches.
 local function findTorchSlot()
-  --for _, slot in ipairs(torchSlots) do
-  --  if robot.count(slot) > 0 then
-  --    return slot
-  --  end
-  --end
-  return torchSlot
+    if robot.count(torchSlot) > 0 then
+      return torchSlot
+    end
 end
 
 -- Since robot.select() is an indirect call, we can speed things up a bit.
@@ -385,13 +382,13 @@ local function dropMinedBlocks()
   
   if component.isAvailable("inventory_controller") then
 	if not component.inventory_controller.getInventorySize(sides.up) then
-      io.write("There doesn't seem to be an inventory below me! Waiting to avoid spilling stuffs into the world.\n")
+      --io.write("There doesn't seem to be an inventory below me! Waiting to avoid spilling stuffs into the world.\n")
     end
 	repeat os.sleep(5) until component.inventory_controller.getInventorySize(sides.up)
   end
   io.write("Dropping what I found.\n")
-  for slot = 1, robot.inventorySize() do
-    while not keepSlot[slot] and robot.count(slot) > 0 do
+  for slot = 7, robot.inventorySize() do
+    while robot.count(slot) > 0 do
       cachedSelect(slot)
 	  robot.dropUp()
     end
@@ -446,13 +443,13 @@ local function checkTorches()
 	if robot.space(torchSlot) > 0 then
 	  cachedSelect(torchSlot)
 	  repeat
-		local before = robot.space()
+		local before = robot.space(torchSlot)
 		--robot.suck(robot.space())
-		robot.suckUp(robot.space())
-		if robot.space() == before then
+		robot.suckUp(robot.space(torchSlot))
+		if robot.space(torchSlot) == before then
 		  os.sleep(5) -- Don't busy idle.
 		end
-	  until robot.space() < 1
+	  until robot.space(torchSlot) < 1
 	  cachedSelect(toolSlot)
 	end
 
@@ -465,10 +462,10 @@ end
 -- Recharge our batteries.
 local function recharge()
   cachedSelect(chargerSlot)
-  robot.place(sides.front)
+  robot.place()
   robot.up()
   cachedSelect(fluxPointSlot)
-  robot.place(sides.front)
+  robot.place()
   robot.down()
   
   io.write("Waiting until my batteries are full.\n")
@@ -477,10 +474,10 @@ local function recharge()
   end
   
   cachedSelect(chargerSlot)
-  robot.swing(sides.front)
+  robot.swing()
   robot.up()
   cachedSelect(fluxPointSlot)
-  robot.swing(sides.front)
+  robot.swing()
   robot.down()
   
 end
@@ -498,14 +495,21 @@ local function gotoMaintenance(force)
 
   local top, count = getTop()
 
-  io.write("Going back to main tunnel for maintenance!\n")
+  io.write("Setting up for maintenance!\n")
   local moves = popMoves()
 
   assert(distanceToOrigin == 0)
 
-  dropMinedBlocks()
+  -- clear the maintenance space
+  robot.swingUp() -- top
+  robot.swing() -- bottom front
+  robot.up()
+  robot.swing() -- top front
+  robot.down()
+  
   checkTool()
   checkTorches()
+  dropMinedBlocks()
   recharge() -- Last so we can charge some during the other operations above.
 
   if moves and #moves > 0 then
@@ -639,7 +643,7 @@ local function main(currentEdge, completedSteps)
   -- Flag slots that contain something as do-not-drop and check
   -- that we have some free inventory space at all.
   local freeSlots = robot.inventorySize()
-  for slot = 1, robot.inventorySize() do
+  for slot = 7, robot.inventorySize() do
     if robot.count(slot) > 0 then
       keepSlot[slot] = true
       freeSlots = freeSlots - 1
@@ -666,9 +670,7 @@ local function main(currentEdge, completedSteps)
 	  -- we have fully finisehd an edge
 	  -- set values for next edge
 	  lastFinishedEdge = currentEdge
-	  io.write("last finished edge " .. lastFinishedEdge .. "\n")
 	  currentEdge = currentEdge + 1
-	  io.write("current edge" .. currentEdge .. "\n")
 	  completedSteps = 0
 	end
 
@@ -684,15 +686,11 @@ if options.h or options.help then
   io.write("  -s:     start without prompting.\n")
   io.write("  -f:     force mining to continue even if max\n")
   io.write("          fuel may be insufficient to return.\n")
-  io.write("  wallThickness: the radius in blocks of the area to\n")
-  io.write("          mine. Adjusted to be a multiple of\n")
-  io.write("          three. Default: 9.\n")
   os.exit()
 end
 
 -- an edge is a full side
 local lastFinishedEdge = 0 -- 0 is no edges complete
-
 
 wallThickness = tonumber(args[1]) or 2
 local startingEdge = tonumber(args[2]) or 1
@@ -709,7 +707,7 @@ end
 
 io.write("I need the following in the proper slots\n")
 io.write("1: Torch Chest\n2: Tool Chest\n3: Ore Chest\n4: Charger\n5: Flux Point\n")
-io.write("I will get tools and torches from above me")
+io.write("I will get tools and torches from above me\n")
 
 if component.isAvailable("inventory_controller") then
   --io.write("I'll try to get new tools from above me.\n")
@@ -721,5 +719,4 @@ io.write("Run with -h or --help for parameter info.\n")
 
 if options.s or prompt("Shall we begin?") then
   main(startingEdge, startingSteps)
-  --checkTorches()
 end
