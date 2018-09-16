@@ -655,6 +655,9 @@ end
 local function dig1x2(length, exhaustive)
   moves = {}
   distanceToOrigin = 0
+  io.print("Average Move Cost: " .. averageMoveCost .. "\n")
+  io.print("Return Cost (should be 0 at start): " .. returnCost .. "\n")
+  
   while length > 0 and move(sides.forward) do
     dig(sides.up, gotoMaintenance)
     digVeins(exhaustive)
