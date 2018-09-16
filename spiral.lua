@@ -709,22 +709,12 @@ end
 
 io.write("I need the following in the proper slots\n")
 io.write("1: Torch Chest\n2: Tool Chest\n3: Ore Chest\n4: Charger\n5: Flux Point\n")
-
---[[
-local torchChestSlot = 1
-local toolChestSlot = 2
-local oreChestSlot = 3
-local chargerSlot = 4
-local fluxPointSlot = 5
-local toolSlot = 6
-local torchSlot = 7
-]]
-
+io.write("I will get tools and torches from above me")
 
 if component.isAvailable("inventory_controller") then
-  io.write("I'll try to get new tools from above me.\n")
+  --io.write("I'll try to get new tools from above me.\n")
 else
-  io.write("You'll need to manually provide me with new tools if they break.\n")
+  --io.write("You'll need to manually provide me with new tools if they break.\n")
 end
 
 io.write("Run with -h or --help for parameter info.\n")
