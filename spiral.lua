@@ -655,11 +655,8 @@ end
 local function dig1x2(length, exhaustive)
   moves = {}
   distanceToOrigin = 0
-  io.write("Average Move Cost: " .. averageMoveCost .. "\n")
-  io.write("Return Cost (should be 5000 at start): " .. costToReturn() .. "\n")
-  
+
   while length > 0 and move(sides.forward) do
-	io.write("Cost to Return: " .. costToReturn() .. "\n")
     dig(sides.up, gotoMaintenance)
     digVeins(exhaustive)
     length = length - 1
@@ -688,7 +685,8 @@ local function main(currentEdge, completedSteps)
   end
   gotoMaintenance(true)
 
-  while currentEdge <= 8 do 
+  --while currentEdge <= 8 do 
+  while true do
 
 	for i = 1, 2, 1 do -- repeat each operation twice
 	  local totalSteps = stepsInEdge(currentEdge)
@@ -705,6 +703,8 @@ local function main(currentEdge, completedSteps)
 	  lastFinishedEdge = currentEdge
 	  currentEdge = currentEdge + 1
 	  completedSteps = 0
+	  
+	  io.write("Finished Edge: " .. lastFinishedEdge .. "\n")
 	end
 
   end -- digs 9 edges
