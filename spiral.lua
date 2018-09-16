@@ -126,10 +126,6 @@ local function findEmptySlot()
   end
 end
 
-local function safeWait()
-	os.sleep(.5)
-end
-
 -- Find the first torch slot that still contains torches.
 local function findTorchSlot()
     if robot.count(torchSlot) > 0 then
@@ -401,7 +397,6 @@ local function dropMinedBlocks()
   
   cachedSelect(oreChestSlot)
   dig(sides.top)
-  safeWait()
 end
 
 -- Ensures we have a tool with durability.
@@ -436,7 +431,6 @@ local function checkTool()
   
   cachedSelect(toolChestSlot)
   dig(sides.top)
-  safeWait()
 end
 
 -- Ensures we have some torches.
@@ -462,7 +456,7 @@ local function checkTorches()
 
 	cachedSelect(torchChestSlot)
 	dig(sides.top)
-	safeWait()
+	
   --end
 end
 
@@ -470,19 +464,13 @@ end
 local function recharge()
   cachedSelect(redstoneSlot)
   robot.down()
-  safeWait()
   robot.place()
-  safeWait()
   cachedSelect(chargerSlot)
   robot.place()
-  safeWait()
   robot.up()
-  safeWait()
   cachedSelect(fluxPointSlot)
   robot.place()
-  safeWait()
   robot.down()
-  safeWait()
   
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
@@ -491,19 +479,14 @@ local function recharge()
   
   cachedSelect(redstoneSlot)
   robot.down()
-  safeWait()
   dig(sides.front)
-  safeWait()
   cachedSelect(chargerSlot)
   dig(sides.front)
-  safeWait()
   robot.up()
-  safeWait()
   cachedSelect(fluxPointSlot)
   dig(sides.front)
-  safeWait()
   robot.down()
-  safeWait()  
+  
 end
 
 -- Go back to the docking bay for general maintenance if necessary.
@@ -526,23 +509,14 @@ local function gotoMaintenance(force)
 
   -- clear the maintenance space
   dig(sides.bottom) -- under
-  safeWait()
   robot.down() 
-  safeWait()
   dig(sides.front) -- bottom front 
-  safeWait()
   robot.up()
-  safeWait()
   dig(sides.front) -- front
-  safeWait()
   dig(sides.top) -- above
-  safeWait()
   robot.up()
-  safeWait()
   dig(sides.front) -- top front
-  safeWait()
   robot.down()
-  safeWait()
   
   checkTool()
   checkTorches()
