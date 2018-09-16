@@ -126,6 +126,10 @@ local function findEmptySlot()
   end
 end
 
+local function safeWait()
+	os.sleep(.5)
+end
+
 -- Find the first torch slot that still contains torches.
 local function findTorchSlot()
     if robot.count(torchSlot) > 0 then
@@ -396,7 +400,8 @@ local function dropMinedBlocks()
   end
   
   cachedSelect(oreChestSlot)
-  robot.swingUp()
+  dig(sides.top)
+  safeWait()
 end
 
 -- Ensures we have a tool with durability.
@@ -430,7 +435,8 @@ local function checkTool()
   end
   
   cachedSelect(toolChestSlot)
-  robot.swingUp()
+  dig(sides.top)
+  safeWait()
 end
 
 -- Ensures we have some torches.
@@ -455,8 +461,8 @@ local function checkTorches()
 	end
 
 	cachedSelect(torchChestSlot)
-	robot.swingUp()
-	
+	dig(sides.top)
+	safeWait()
   --end
 end
 
@@ -464,13 +470,19 @@ end
 local function recharge()
   cachedSelect(redstoneSlot)
   robot.down()
+  safeWait()
   robot.place()
+  safeWait()
   cachedSelect(chargerSlot)
   robot.place()
+  safeWait()
   robot.up()
+  safeWait()
   cachedSelect(fluxPointSlot)
   robot.place()
+  safeWait()
   robot.down()
+  safeWait()
   
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
@@ -479,14 +491,19 @@ local function recharge()
   
   cachedSelect(redstoneSlot)
   robot.down()
-  robot.swing()
+  safeWait()
+  dig(sides.front)
+  safeWait()
   cachedSelect(chargerSlot)
-  robot.swing()
+  dig(sides.front)
+  safeWait()
   robot.up()
+  safeWait()
   cachedSelect(fluxPointSlot)
-  robot.swing()
+  dig(sides.front)
+  safeWait()
   robot.down()
-  
+  safeWait()  
 end
 
 -- Go back to the docking bay for general maintenance if necessary.
@@ -508,15 +525,24 @@ local function gotoMaintenance(force)
   assert(distanceToOrigin == 0)
 
   -- clear the maintenance space
-  robot.swingDown() -- under
+  dig(sides.bottom) -- under
+  safeWait()
   robot.down() 
-  robot.swing() -- bottom front 
+  safeWait()
+  dig(sides.front) -- bottom front 
+  safeWait()
   robot.up()
-  robot.swing() -- front
-  robot.swingUp() -- above
+  safeWait()
+  dig(sides.front) -- front
+  safeWait()
+  dig(sides.top) -- above
+  safeWait()
   robot.up()
-  robot.swing() -- top front
+  safeWait()
+  dig(sides.front) -- top front
+  safeWait()
   robot.down()
+  safeWait()
   
   checkTool()
   checkTorches()
