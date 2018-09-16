@@ -118,7 +118,7 @@ end
 
 -- Look for the first empty slot in our inventory.
 local function findEmptySlot()
-  for slot = 1, robot.inventorySize() do
+  for slot = 8, robot.inventorySize() do
     if robot.count(slot) == 0 then
       return slot
     end
@@ -151,7 +151,7 @@ local function placeTorch()
   if slot then
     cachedSelect(slot)
     result = robot.placeUp(sides.right)
-    cachedSelect(1)
+    cachedSelect(toolSlot)
   end
   return result
 end
@@ -166,7 +166,7 @@ local function dig(side, callback)
       callback(not emptySlot) -- Parameter: is inventory full.
       emptySlot = findEmptySlot()
     end
-    cachedSelect(1)
+    cachedSelect(toolSlot) -- was 1
 
     local something, what = component.robot.detect(side)
     if not something or what == "replaceable" or what == "liquid" then
@@ -183,11 +183,11 @@ local function dig(side, callback)
     elseif component.isAvailable("inventory_controller") and emptySlot then
       cachedSelect(emptySlot)
       component.inventory_controller.equip() -- Save some tool durability.
-      cachedSelect(1)
+      cachedSelect(toolSlot)
       brokeSomething = component.robot.swing(side)
       cachedSelect(emptySlot)
       component.inventory_controller.equip()
-      cachedSelect(1)
+      cachedSelect(toolSlot)
     end
     if not brokeSomething then
       brokeSomething = component.robot.swing(side)
@@ -380,7 +380,9 @@ end
 
 -- Drops all inventory contents that are not marked for keeping.
 local function dropMinedBlocks()
-  -- place the ore chest above robot
+  cachedSelect(oreChestSlot)
+  robot.placeUp()
+  
   if component.isAvailable("inventory_controller") then
 	if not component.inventory_controller.getInventorySize(sides.up) then
       io.write("There doesn't seem to be an inventory below me! Waiting to avoid spilling stuffs into the world.\n")
@@ -394,13 +396,17 @@ local function dropMinedBlocks()
 	  robot.dropUp()
     end
   end
-  cachedSelect(1)
-  -- remove the ore chest
+  
+  cachedSelect(oreChestSlot)
+  robot.swingUp()
 end
 
 -- Ensures we have a tool with durability.
 --BUG starts from the first slot (suckUp does this) and only pulls one thing, regardless of the thing.
 local function checkTool()
+  cachedSelect(toolChestSlot)
+  robot.placeUp()
+  
   -- place the tool chest above robot
   if not robot.durability() then
     io.write("Tool is broken, getting a new one.\n")
@@ -415,7 +421,7 @@ local function checkTool()
         robot.suckUp(1) -- Pull something from above and equip it.
         component.inventory_controller.equip()
       until robot.durability()
-      cachedSelect(1)
+      cachedSelect(toolSlot)
     else
       -- Can't re-equip autonomously, wait for player to give us a tool.
       io.write("HALP! I need a new tool.\n")
@@ -425,35 +431,18 @@ local function checkTool()
     end
   end
   
-  --remove the tool chest above robot
+  cachedSelect(toolChestSlot)
+  robot.swingUp()
 end
 
 -- Ensures we have some torches.
 local function checkTorches()
   -- First, clean up our list and look for empty slots.
   io.write("Getting my fill of torches.\n")
-  --local oldTorchSlots = torchSlots
-  --torchSlots = {}
-  --for _, slot in ipairs(oldTorchSlots) do
-  --  keepSlot[slot] = nil
-  --  if robot.count(slot) > 0 then
-  --    torchSlots[#torchSlots + 1] = slot
-  --  end
-  --end
-  --while #torchSlots < torchStacks() do
-  --  local slot = findEmptySlot()
-  --  if not slot then
-  --    break -- This should never happen...
-  --  end
-  --  torchSlots[#torchSlots + 1] = slot
-  --end
-  -- Then fill the slots with torches.
-  --for _, slot in ipairs(torchSlots) do
-  --  keepSlot[slot] = true
   
-  -- place the torch chest
   cachedSelect(torchChestSlot)
   robot.placeUp()
+  
 	if robot.space(torchSlot) > 0 then
 	  cachedSelect(torchSlot)
 	  repeat
@@ -464,9 +453,9 @@ local function checkTorches()
 		  os.sleep(5) -- Don't busy idle.
 		end
 	  until robot.space() < 1
-	  cachedSelect(1)
+	  cachedSelect(toolSlot)
 	end
-	-- remove the torch chest
+
 	cachedSelect(torchChestSlot)
 	robot.swingUp()
 	
@@ -475,15 +464,25 @@ end
 
 -- Recharge our batteries.
 local function recharge()
-  --place the charger
-  -- place the flux point
+  cachedSelect(chargerSlot)
+  robot.place(sides.front)
+  robot.up()
+  cachedSelect(fluxPointSlot)
+  robot.place(sides.front)
+  robot.down()
+  
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
     os.sleep(1)
   end
   
-  --remove the flux point
-  -- remove the charger
+  cachedSelect(chargerSlot)
+  robot.swing(sides.front)
+  robot.up()
+  cachedSelect(fluxPointSlot)
+  robot.swing(sides.front)
+  robot.down()
+  
 end
 
 -- Go back to the docking bay for general maintenance if necessary.
@@ -708,8 +707,20 @@ if not component.isAvailable("inventory_controller") then
   io.write("Installing an inventory controller upgrade is strongly recommended.\n")
 end
 
-io.write("I'll drop mined out stuff below me.\n")
-io.write("I'll be looking for torches on my left.\n")
+io.write("I need the following in the proper slots\n")
+io.write("1: Torch Chest, 2: Tool Chest, 3: Ore Chest, 4: Charger, 5: Flux Point\n")
+
+--[[
+local torchChestSlot = 1
+local toolChestSlot = 2
+local oreChestSlot = 3
+local chargerSlot = 4
+local fluxPointSlot = 5
+local toolSlot = 6
+local torchSlot = 7
+]]
+
+
 if component.isAvailable("inventory_controller") then
   io.write("I'll try to get new tools from above me.\n")
 else
