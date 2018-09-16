@@ -70,8 +70,6 @@ local redstoneSlot = 6
 local torchSlot = 7
 local toolSlot = 8
 
-local gotoMaintenance = nil
-
 --local torchSlots = {}
 
 --[[ "Passive" logic ]]--------------------------------------------------------
@@ -364,6 +362,20 @@ end
 
 --[[ Maintenance ]]------------------------------------------------------------
 
+local function customMove(side)
+  local result, reason, retry
+  repeat
+    retry = false
+    if side ~= sides.back then
+      retry = dig(side)
+    else
+      --gotoMaintenance()
+    end
+    result, reason = pushMove(side)
+  until result or not retry
+  return result, reason
+end
+
 -- Energy required to return to docking bay.
 --MODIFIED
 local function costToReturn()
@@ -398,8 +410,8 @@ local function dropMinedBlocks()
   end
   
   cachedSelect(oreChestSlot)
-  move(sides.top)
-  move(sides.bottom)
+  customMove(sides.top)
+  customMove(sides.bottom)
 end
 
 -- Ensures we have a tool with durability.
@@ -433,8 +445,8 @@ local function checkTool()
   end
   
   cachedSelect(toolChestSlot)
-  move(sides.top)
-  move(sides.bottom)
+  customMove(sides.top)
+  customMove(sides.bottom)
 end
 
 -- Ensures we have some torches.
@@ -459,8 +471,8 @@ local function checkTorches()
 	end
 
 	cachedSelect(torchChestSlot)
-	move(sides.top)
-	move(sides.bottom)
+	customMove(sides.top)
+	customMove(sides.bottom)
 	
   --end
 end
@@ -468,15 +480,15 @@ end
 -- Recharge our batteries.
 local function recharge()
   cachedSelect(redstoneSlot)
-  move(sides.bottom)
+  customMove(sides.bottom)
   robot.place()
   cachedSelect(chargerSlot)
-  move(sides.top)
+  customMove(sides.top)
   robot.place()
   cachedSelect(fluxPointSlot)
-  move(sides.top)
+  customMove(sides.top)
   robot.place()
-  move(sides.down)
+  customMove(sides.down)
   
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
@@ -484,42 +496,23 @@ local function recharge()
   end
   
   cachedSelect(redstoneSlot)
-  move(sides.bottom)
-  move(sides.front)
-  move(sides.back)
+  customMove(sides.bottom)
+  customMove(sides.front)
+  customMove(sides.back)
   cachedSelect(chargerSlot)
-  move(sides.top)
-  move(sides.front)
-  move(sides.back)
+  customMove(sides.top)
+  customMove(sides.front)
+  customMove(sides.back)
   cachedSelect(fluxPointSlot)
-  move(sides.top)
-  move(sides.front)
-  move(sides.back)
-  move(sides.bottom)
+  customMove(sides.top)
+  customMove(sides.front)
+  customMove(sides.back)
+  customMove(sides.bottom)
   
 end
 
---[[ Mining ]]-----------------------------------------------------------------
-
--- Move towards the specified direction, digging out blocks as necessary.
--- This is a "soft" version of forceMove in that it will try to clear its path,
--- but fail if it can't.
-local function move(side)
-  local result, reason, retry
-  repeat
-    retry = false
-    if side ~= sides.back then
-      retry = dig(side, gotoMaintenance)
-    else
-      gotoMaintenance()
-    end
-    result, reason = pushMove(side)
-  until result or not retry
-  return result, reason
-end
-
 -- Go back to the docking bay for general maintenance if necessary.
-gotoMaintenance = function(force)
+local function gotoMaintenance(force)
   if not force and not needsMaintenance() then
     return -- No need yet.
   end
@@ -537,16 +530,16 @@ gotoMaintenance = function(force)
   assert(distanceToOrigin == 0)
 
   -- clear the maintenance space
-  move(sides.bottom) -- under
-  move(sides.front) -- bottom front 
-  move(sides.back)
-  move(sides.top)
-  move(sides.front) -- front
-  move(sides.back)
-  move(sides.top) -- above
-  move(sides.front) -- top front
-  move(sides.back)
-  move(sides.bottom)
+  customMove(sides.bottom) -- under
+  customMove(sides.front) -- bottom front 
+  customMove(sides.back)
+  customMove(sides.top)
+  customMove(sides.front) -- front
+  customMove(sides.back)
+  customMove(sides.top) -- above
+  customMove(sides.front) -- top front
+  customMove(sides.back)
+  customMove(sides.bottom)
   
   checkTool()
   checkTorches()
@@ -571,6 +564,24 @@ gotoMaintenance = function(force)
   onMove = moveCallback
 end
 
+--[[ Mining ]]-----------------------------------------------------------------
+
+-- Move towards the specified direction, digging out blocks as necessary.
+-- This is a "soft" version of forceMove in that it will try to clear its path,
+-- but fail if it can't.
+local function move(side)
+  local result, reason, retry
+  repeat
+    retry = false
+    if side ~= sides.back then
+      retry = dig(side, gotoMaintenance)
+    else
+      gotoMaintenance()
+    end
+    result, reason = pushMove(side)
+  until result or not retry
+  return result, reason
+end
 
 -- Turn to face the specified, relative orientation.
 local function turnTowards(side)
