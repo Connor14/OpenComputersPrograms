@@ -70,7 +70,7 @@ local redstoneSlot = 6
 local torchSlot = 7
 local toolSlot = 8
 
-local move = nil
+local gotoMaintenance = nil
 
 --local torchSlots = {}
 
@@ -499,8 +499,27 @@ local function recharge()
   
 end
 
+--[[ Mining ]]-----------------------------------------------------------------
+
+-- Move towards the specified direction, digging out blocks as necessary.
+-- This is a "soft" version of forceMove in that it will try to clear its path,
+-- but fail if it can't.
+local function move(side)
+  local result, reason, retry
+  repeat
+    retry = false
+    if side ~= sides.back then
+      retry = dig(side, gotoMaintenance)
+    else
+      gotoMaintenance()
+    end
+    result, reason = pushMove(side)
+  until result or not retry
+  return result, reason
+end
+
 -- Go back to the docking bay for general maintenance if necessary.
-local function gotoMaintenance(force)
+gotoMaintenance = function gotoMaintenance(force)
   if not force and not needsMaintenance() then
     return -- No need yet.
   end
@@ -552,24 +571,6 @@ local function gotoMaintenance(force)
   onMove = moveCallback
 end
 
---[[ Mining ]]-----------------------------------------------------------------
-
--- Move towards the specified direction, digging out blocks as necessary.
--- This is a "soft" version of forceMove in that it will try to clear its path,
--- but fail if it can't.
-move = local function move(side)
-  local result, reason, retry
-  repeat
-    retry = false
-    if side ~= sides.back then
-      retry = dig(side, gotoMaintenance)
-    else
-      gotoMaintenance()
-    end
-    result, reason = pushMove(side)
-  until result or not retry
-  return result, reason
-end
 
 -- Turn to face the specified, relative orientation.
 local function turnTowards(side)
