@@ -519,7 +519,7 @@ local function move(side)
 end
 
 -- Go back to the docking bay for general maintenance if necessary.
-gotoMaintenance = function gotoMaintenance(force)
+gotoMaintenance = function(force)
   if not force and not needsMaintenance() then
     return -- No need yet.
   end
