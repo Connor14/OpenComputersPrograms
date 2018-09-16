@@ -373,6 +373,7 @@ local function customMove(side)
     end
     result, reason = pushMove(side)
   until result or not retry
+  os.wait(1)
   return result, reason
 end
 
