@@ -396,7 +396,7 @@ local function dropMinedBlocks()
   end
   
   cachedSelect(oreChestSlot)
-  dig(sides.top)
+  robot.swingUp()
 end
 
 -- Ensures we have a tool with durability.
@@ -430,7 +430,7 @@ local function checkTool()
   end
   
   cachedSelect(toolChestSlot)
-  dig(sides.top)
+  robot.swingUp()
 end
 
 -- Ensures we have some torches.
@@ -455,7 +455,7 @@ local function checkTorches()
 	end
 
 	cachedSelect(torchChestSlot)
-	dig(sides.top)
+	robot.swingUp()
 	
   --end
 end
@@ -479,12 +479,12 @@ local function recharge()
   
   cachedSelect(redstoneSlot)
   robot.down()
-  dig(sides.front)
+  robot.swing()
   cachedSelect(chargerSlot)
-  dig(sides.front)
+  robot.swing()
   robot.up()
   cachedSelect(fluxPointSlot)
-  dig(sides.front)
+  robot.swing()
   robot.down()
   
 end
@@ -508,14 +508,14 @@ local function gotoMaintenance(force)
   assert(distanceToOrigin == 0)
 
   -- clear the maintenance space
-  dig(sides.bottom) -- under
+  robot.swingDown() -- under
   robot.down() 
-  dig(sides.front) -- bottom front 
+  robot.swing() -- bottom front 
   robot.up()
-  dig(sides.front) -- front
-  dig(sides.top) -- above
+  robot.swing() -- front
+  robot.swingUp() -- above
   robot.up()
-  dig(sides.front) -- top front
+  robot.swing() -- top front
   robot.down()
   
   checkTool()
