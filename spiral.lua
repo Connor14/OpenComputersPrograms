@@ -716,8 +716,19 @@ if not component.isAvailable("inventory_controller") then
   io.write("Installing an inventory controller upgrade is strongly recommended.\n")
 end
 
+--[[
+local toolChestSlot = 1
+local torchChestSlot = 2
+local oreChestSlot = 3
+local chargerSlot = 4
+local fluxPointSlot = 5
+local redstoneSlot = 6
+local torchSlot = 7
+local toolSlot = 8
+]]
+
 io.write("I need the following in the proper slots\n")
-io.write("1: Torch Chest\n2: Tool Chest\n3: Ore Chest\n4: Charger\n5: Flux Point\n")
+io.write("1: Tool Ender Chest (red)\n2: Torch Ender Chest (green)\n3: Ore Ender Chest (blue)\n4: Charger\n5: Flux Point\n6: Redstone Block\n")
 io.write("I will get tools and torches from above me\n")
 
 if component.isAvailable("inventory_controller") then
