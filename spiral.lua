@@ -66,8 +66,9 @@ local torchChestSlot = 2
 local oreChestSlot = 3
 local chargerSlot = 4
 local fluxPointSlot = 5
-local torchSlot = 6
-local toolSlot = 7
+local redstoneSlot = 6
+local torchSlot = 7
+local toolSlot = 8
 
 --local torchSlots = {}
 
@@ -118,7 +119,7 @@ end
 
 -- Look for the first empty slot in our inventory.
 local function findEmptySlot()
-  for slot = 7, robot.inventorySize() do
+  for slot = 8, robot.inventorySize() do
     if robot.count(slot) == 0 then
       return slot
     end
@@ -387,7 +388,7 @@ local function dropMinedBlocks()
 	repeat os.sleep(5) until component.inventory_controller.getInventorySize(sides.up)
   end
   io.write("Dropping what I found.\n")
-  for slot = 7, robot.inventorySize() do
+  for slot = 8, robot.inventorySize() do
     while robot.count(slot) > 0 do
       cachedSelect(slot)
 	  robot.dropUp()
@@ -461,6 +462,9 @@ end
 
 -- Recharge our batteries.
 local function recharge()
+  cachedSelect(redstoneSlot)
+  robot.down()
+  robot.place()
   cachedSelect(chargerSlot)
   robot.place()
   robot.up()
@@ -473,6 +477,9 @@ local function recharge()
     os.sleep(1)
   end
   
+  cachedSelect(redstoneSlot)
+  robot.down()
+  robot.swing()
   cachedSelect(chargerSlot)
   robot.swing()
   robot.up()
@@ -501,8 +508,12 @@ local function gotoMaintenance(force)
   assert(distanceToOrigin == 0)
 
   -- clear the maintenance space
-  robot.swingUp() -- top
-  robot.swing() -- bottom front
+  robot.swingDown() -- under
+  robot.down() 
+  robot.swing() -- bottom front 
+  robot.up()
+  robot.swing() -- front
+  robot.swingUp() -- above
   robot.up()
   robot.swing() -- top front
   robot.down()
@@ -643,7 +654,7 @@ local function main(currentEdge, completedSteps)
   -- Flag slots that contain something as do-not-drop and check
   -- that we have some free inventory space at all.
   local freeSlots = robot.inventorySize()
-  for slot = 7, robot.inventorySize() do
+  for slot = 8, robot.inventorySize() do
     if robot.count(slot) > 0 then
       keepSlot[slot] = true
       freeSlots = freeSlots - 1
