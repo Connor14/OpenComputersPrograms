@@ -719,6 +719,6 @@ end
 io.write("Run with -h or --help for parameter info.\n")
 
 if options.s or prompt("Shall we begin?") then
-  --main(startingEdge, startingSteps)
-  checkTorches()
+  main(startingEdge, startingSteps)
+  --checkTorches()
 end
