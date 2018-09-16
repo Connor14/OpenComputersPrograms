@@ -396,7 +396,8 @@ local function dropMinedBlocks()
   end
   
   cachedSelect(oreChestSlot)
-  dig(sides.top)
+  move(sides.top)
+  move(sides.bottom)
 end
 
 -- Ensures we have a tool with durability.
@@ -430,7 +431,8 @@ local function checkTool()
   end
   
   cachedSelect(toolChestSlot)
-  dig(sides.top)
+  move(sides.top)
+  move(sides.bottom)
 end
 
 -- Ensures we have some torches.
@@ -455,7 +457,8 @@ local function checkTorches()
 	end
 
 	cachedSelect(torchChestSlot)
-	dig(sides.top)
+	move(sides.top)
+	move(sides.bottom)
 	
   --end
 end
@@ -463,14 +466,15 @@ end
 -- Recharge our batteries.
 local function recharge()
   cachedSelect(redstoneSlot)
-  robot.down()
+  move(sides.bottom)
   robot.place()
   cachedSelect(chargerSlot)
+  move(sides.top)
   robot.place()
-  robot.up()
   cachedSelect(fluxPointSlot)
+  move(sides.top)
   robot.place()
-  robot.down()
+  move(sides.down)
   
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
@@ -478,14 +482,18 @@ local function recharge()
   end
   
   cachedSelect(redstoneSlot)
-  robot.down()
-  dig(sides.front)
+  move(sides.bottom)
+  move(sides.front)
+  move(sides.back)
   cachedSelect(chargerSlot)
-  dig(sides.front)
-  robot.up()
+  move(sides.top)
+  move(sides.front)
+  move(sides.back)
   cachedSelect(fluxPointSlot)
-  dig(sides.front)
-  robot.down()
+  move(sides.top)
+  move(sides.front)
+  move(sides.back)
+  move(sides.bottom)
   
 end
 
@@ -508,15 +516,16 @@ local function gotoMaintenance(force)
   assert(distanceToOrigin == 0)
 
   -- clear the maintenance space
-  dig(sides.bottom) -- under
-  robot.down() 
-  dig(sides.front) -- bottom front 
-  robot.up()
-  dig(sides.front) -- front
-  dig(sides.top) -- above
-  robot.up()
-  dig(sides.front) -- top front
-  robot.down()
+  move(sides.bottom) -- under
+  move(sides.front) -- bottom front 
+  move(sides.back)
+  move(sides.top)
+  move(sides.front) -- front
+  move(sides.back)
+  move(sides.top) -- above
+  move(sides.front) -- top front
+  move(sides.back)
+  move(sides.bottom)
   
   checkTool()
   checkTorches()
