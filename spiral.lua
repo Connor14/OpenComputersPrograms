@@ -692,7 +692,7 @@ local function main(currentEdge, completedSteps)
 end
 
 if options.h or options.help then
-  io.write("Usage: spiral [-hsf] [wallThickness [startingEdge [startingSteps]]]\n")
+  io.write("Usage: spiral [-hsf] [wallThickness (2) [startingEdge (1) [startingSteps (0)]]]\n")
   io.write("  -h:     this help listing.\n")
   io.write("  -s:     start without prompting.\n")
   io.write("  -f:     force mining to continue even if max\n")
