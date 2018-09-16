@@ -70,6 +70,8 @@ local redstoneSlot = 6
 local torchSlot = 7
 local toolSlot = 8
 
+local move = nil
+
 --local torchSlots = {}
 
 --[[ "Passive" logic ]]--------------------------------------------------------
@@ -555,7 +557,7 @@ end
 -- Move towards the specified direction, digging out blocks as necessary.
 -- This is a "soft" version of forceMove in that it will try to clear its path,
 -- but fail if it can't.
-local function move(side)
+move = local function move(side)
   local result, reason, retry
   repeat
     retry = false
