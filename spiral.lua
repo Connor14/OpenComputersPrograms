@@ -373,7 +373,7 @@ local function customMove(side)
     end
     result, reason = pushMove(side)
   until result or not retry
-  os.wait(1)
+  --os.wait(1)
   return result, reason
 end
 
@@ -531,14 +531,10 @@ local function gotoMaintenance(force)
   assert(distanceToOrigin == 0)
 
   -- clear the maintenance space
-  customMove(sides.bottom) -- under
-  customMove(sides.front) -- bottom front 
-  customMove(sides.back)
+  customMove(sides.bottom)
+  customMove(sides.front)
   customMove(sides.top)
-  customMove(sides.front) -- front
-  customMove(sides.back)
-  customMove(sides.top) -- above
-  customMove(sides.front) -- top front
+  customMove(sides.top)
   customMove(sides.back)
   customMove(sides.bottom)
   
@@ -753,7 +749,7 @@ local toolSlot = 8
 
 io.write("I need the following in the proper slots\n")
 io.write("1: Tool Ender Chest (red)\n2: Torch Ender Chest (green)\n3: Ore Ender Chest (blue)\n4: Charger\n5: Flux Point\n6: Redstone Block\n")
-io.write("I will get tools and torches from above me\n")
+io.write("I will get tools and torches from above me\nBUT I NEED A TOOL TO START PLEASE\n")
 
 if component.isAvailable("inventory_controller") then
   --io.write("I'll try to get new tools from above me.\n")

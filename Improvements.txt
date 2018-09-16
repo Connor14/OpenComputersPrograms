@@ -1,0 +1,6 @@
+BUGS:
+
+
+If there are no blocks that we can place our maintenance stuff on, we will fail (specifically charging)
+
+If the tool doesn't have enough durability to set of the maintenance center.
