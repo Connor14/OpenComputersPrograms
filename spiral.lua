@@ -160,6 +160,7 @@ local function dig(side, callback)
     -- Check for maintenance first, to make sure we make the return trip when
     -- our batteries are running low.
     local emptySlot = findEmptySlot()
+	
     if callback then
       callback(not emptySlot) -- Parameter: is inventory full.
       emptySlot = findEmptySlot()
@@ -411,8 +412,7 @@ local function dropMinedBlocks()
   end
   
   cachedSelect(oreChestSlot)
-  customMove(sides.top)
-  customMove(sides.bottom)
+  robot.swingUp()
 end
 
 -- Ensures we have a tool with durability.
@@ -446,8 +446,7 @@ local function checkTool()
   end
   
   cachedSelect(toolChestSlot)
-  customMove(sides.top)
-  customMove(sides.bottom)
+  robot.swingUp()
 end
 
 -- Ensures we have some torches.
@@ -472,24 +471,22 @@ local function checkTorches()
 	end
 
 	cachedSelect(torchChestSlot)
-	customMove(sides.top)
-	customMove(sides.bottom)
-	
+	robot.swingUp()	
   --end
 end
 
 -- Recharge our batteries.
 local function recharge()
   cachedSelect(redstoneSlot)
-  customMove(sides.bottom)
+  robot.down()
   robot.place()
   cachedSelect(chargerSlot)
-  customMove(sides.top)
+  robot.up()
   robot.place()
   cachedSelect(fluxPointSlot)
-  customMove(sides.top)
+  robot.up()
   robot.place()
-  customMove(sides.down)
+  robot.down()
   
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
@@ -497,18 +494,15 @@ local function recharge()
   end
   
   cachedSelect(redstoneSlot)
-  customMove(sides.bottom)
-  customMove(sides.front)
-  customMove(sides.back)
+  robot.down()
+  robot.swing()
   cachedSelect(chargerSlot)
-  customMove(sides.top)
-  customMove(sides.front)
-  customMove(sides.back)
+  robot.up()
+  robot.swing()
   cachedSelect(fluxPointSlot)
-  customMove(sides.top)
-  customMove(sides.front)
-  customMove(sides.back)
-  customMove(sides.bottom)
+  robot.up()
+  robot.swing()
+  robot.down()
   
 end
 
