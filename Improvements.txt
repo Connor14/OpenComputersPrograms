@@ -7,14 +7,6 @@ BUGS:
 - during the maintenance functions that DON'T use the customMove function, if a mob is in the way, the robot will fail to move
 
 
-
-
-- the robot requires maintenance when it doens't really. Does this have to do with the energy prediction?
-	- FIX THE energy prediction. Set to a constant 5000 or so. Do not use the average
-
-- I need to use the Angel Upgrade to place blocks in thin air.
-- Therefore, I need a better CPU to put in another upgrade.
-
 All Required Parts/Upgrades:
 	Tier 3 Case
 
@@ -34,10 +26,8 @@ All Required Parts/Upgrades:
 	Inventory controller
 	Chunk loader
 	Hover Upgrade
-	Angel
-	Inventory x2 (or 1 inventory with battery upgrade, but not recommended)
+	Battery Upgrade
+	Inventory x2
 	
+	Angel doesn't work as of OC 1.7.2
 	
-	
-	
-How to use the Angel upgrade? Test with a simple "place" script

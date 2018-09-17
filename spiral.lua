@@ -37,6 +37,8 @@ local maxVeinRecursion = 8
 -- Every how many blocks to place a torch when placing torches.
 local torchInverval = 11
 
+local durabilityThreshold = 20
+
 --[[ Constants ]]--------------------------------------------------------------
 
 -- Quick look-up table for inverting directions.
@@ -387,7 +389,7 @@ end
 
 -- Checks whether we need maintenance.
 local function needsMaintenance()
-  return not robot.durability() or -- Tool broken?
+  return robot.durability() < durabilityThreshold or -- Tool almost broken?
          computer.energy() < costToReturn() or -- Out of juice?
          not findTorchSlot() -- No more torches?
 end
@@ -422,7 +424,8 @@ local function checkTool()
   robot.placeDown()
   
   -- place the tool chest above robot
-  if not robot.durability() then
+  --if not robot.durability() then
+  if robot.durability() < durabilityThreshold then
     io.write("Tool is broken, getting a new one.\n")
     if component.isAvailable("inventory_controller") then
       --cachedSelect(findEmptySlot()) -- Select an empty slot for working.
@@ -430,11 +433,12 @@ local function checkTool()
       repeat
         component.inventory_controller.equip() -- Drop whatever's in the tool slot.
         while robot.count() > 0 do
-          robot.dropDown()
+          --robot.dropDown()
+		  robot.dropUp() -- drop the tool into the world
         end
-        robot.suckDown(1) -- Pull something from above and equip it.
+        robot.suckDown(1) -- Pull something from below and equip it.
         component.inventory_controller.equip()
-      until robot.durability()
+      until robot.durability() > durabilityThreshold
       cachedSelect(toolSlot)
     else
       -- Can't re-equip autonomously, wait for player to give us a tool.
@@ -551,7 +555,7 @@ local function gotoMaintenance(force)
   dropMinedBlocks()
   recharge() -- Last so we can charge some during the other operations above.
 
-  popMoves()
+  popMoves() -- get back to the start position
   
   if moves and #moves > 0 then
     if returnCost * 2 > computer.maxEnergy() and
