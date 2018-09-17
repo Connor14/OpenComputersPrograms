@@ -15,8 +15,6 @@ BUGS:
 - I need to use the Angel Upgrade to place blocks in thin air.
 - Therefore, I need a better CPU to put in another upgrade.
 
-
-
 All Required Parts/Upgrades:
 	Tier 3 Case
 
@@ -38,3 +36,8 @@ All Required Parts/Upgrades:
 	Hover Upgrade
 	Angel
 	Inventory x2 (or 1 inventory with battery upgrade, but not recommended)
+	
+	
+	
+	
+How to use the Angel upgrade? Test with a simple "place" script

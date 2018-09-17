@@ -395,7 +395,7 @@ end
 -- Drops all inventory contents that are not marked for keeping.
 local function dropMinedBlocks()
   cachedSelect(oreChestSlot)
-  robot.placeUp()
+  robot.placeDown()
   
   if component.isAvailable("inventory_controller") then
 	if not component.inventory_controller.getInventorySize(sides.up) then
@@ -412,14 +412,14 @@ local function dropMinedBlocks()
   end
   
   cachedSelect(oreChestSlot)
-  robot.swingUp()
+  robot.swingDown()
 end
 
 -- Ensures we have a tool with durability.
 --BUG starts from the first slot (suckUp does this) and only pulls one thing, regardless of the thing.
 local function checkTool()
   cachedSelect(toolChestSlot)
-  robot.placeUp()
+  robot.placeDown()
   
   -- place the tool chest above robot
   if not robot.durability() then
@@ -446,7 +446,7 @@ local function checkTool()
   end
   
   cachedSelect(toolChestSlot)
-  robot.swingUp()
+  robot.swingDown()
 end
 
 -- Ensures we have some torches.
@@ -455,7 +455,7 @@ local function checkTorches()
   io.write("Getting my fill of torches.\n")
   
   cachedSelect(torchChestSlot)
-  robot.placeUp()
+  robot.placeDown()
   
 	if robot.space(torchSlot) > 0 then
 	  cachedSelect(torchSlot)
@@ -471,7 +471,7 @@ local function checkTorches()
 	end
 
 	cachedSelect(torchChestSlot)
-	robot.swingUp()	
+	robot.swingDown()	
   --end
 end
 
@@ -524,7 +524,17 @@ local function gotoMaintenance(force)
 
   assert(distanceToOrigin == 0)
 
-  -- clear the maintenance space
+  --find a suitable position for maintenance
+  repeat 
+    customMove(sides.down)
+	local detectBottomBack = robot.detectDown()
+	customMove(sides.forward)
+	local detectBottomFront = robot.detectDown()
+	customMove(sides.back)
+  until back and front
+  customMove(sides.top) -- get back to 1 block above floor. We place chests below us
+
+  -- clear out everything, just in case.
   customMove(sides.bottom)
   customMove(sides.front)
   customMove(sides.top)
