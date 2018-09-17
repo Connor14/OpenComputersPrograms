@@ -438,7 +438,7 @@ local function checkTool()
         end
         robot.suckDown(1) -- Pull something from below and equip it.
         component.inventory_controller.equip()
-      until robot.durability() > durabilityThreshold
+      until robot.durability()
       cachedSelect(toolSlot)
     else
       -- Can't re-equip autonomously, wait for player to give us a tool.
