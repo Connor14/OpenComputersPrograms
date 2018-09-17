@@ -398,16 +398,16 @@ local function dropMinedBlocks()
   robot.placeDown()
   
   if component.isAvailable("inventory_controller") then
-	if not component.inventory_controller.getInventorySize(sides.up) then
+	if not component.inventory_controller.getInventorySize(sides.bottom) then
       --io.write("There doesn't seem to be an inventory below me! Waiting to avoid spilling stuffs into the world.\n")
     end
-	repeat os.sleep(5) until component.inventory_controller.getInventorySize(sides.up)
+	repeat os.sleep(5) until component.inventory_controller.getInventorySize(sides.bottom)
   end
   io.write("Dropping what I found.\n")
   for slot = 8, robot.inventorySize() do
     while robot.count(slot) > 0 do
       cachedSelect(slot)
-	  robot.dropUp()
+	  robot.dropDown()
     end
   end
   
@@ -430,9 +430,9 @@ local function checkTool()
       repeat
         component.inventory_controller.equip() -- Drop whatever's in the tool slot.
         while robot.count() > 0 do
-          robot.dropUp()
+          robot.dropDown()
         end
-        robot.suckUp(1) -- Pull something from above and equip it.
+        robot.suckDown(1) -- Pull something from above and equip it.
         component.inventory_controller.equip()
       until robot.durability()
       cachedSelect(toolSlot)
@@ -462,7 +462,7 @@ local function checkTorches()
 	  repeat
 		local before = robot.space(torchSlot)
 		--robot.suck(robot.space())
-		robot.suckUp(robot.space(torchSlot))
+		robot.suckDown(robot.space(torchSlot))
 		if robot.space(torchSlot) == before then
 		  os.sleep(5) -- Don't busy idle.
 		end
@@ -551,6 +551,8 @@ local function gotoMaintenance(force)
   dropMinedBlocks()
   recharge() -- Last so we can charge some during the other operations above.
 
+  popMoves()
+  
   if moves and #moves > 0 then
     if returnCost * 2 > computer.maxEnergy() and
        not options.f and
