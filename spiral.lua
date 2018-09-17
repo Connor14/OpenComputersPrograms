@@ -37,7 +37,7 @@ local maxVeinRecursion = 8
 -- Every how many blocks to place a torch when placing torches.
 local torchInverval = 11
 
-local durabilityThreshold = 20
+local durabilityThreshold = .1
 
 --[[ Constants ]]--------------------------------------------------------------
 
