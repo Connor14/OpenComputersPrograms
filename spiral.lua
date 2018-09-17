@@ -527,11 +527,11 @@ local function gotoMaintenance(force)
   --find a suitable position for maintenance
   repeat 
     customMove(sides.down)
-	local detectBottomBack = robot.detectDown()
-	customMove(sides.forward)
-	local detectBottomFront = robot.detectDown()
-	customMove(sides.back)
-  until back and front
+    local detectBottomBack = robot.detectDown()
+    customMove(sides.forward)
+    local detectBottomFront = robot.detectDown()
+    customMove(sides.back)
+  until detectBottomBack and detectBottomFront
   customMove(sides.top) -- get back to 1 block above floor. We place chests below us
 
   -- clear out everything, just in case.
