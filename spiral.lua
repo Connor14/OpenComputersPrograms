@@ -1,16 +1,10 @@
 --[[
-  Branch mining program for OpenComputers robots.
+  Spiral mining program for OpenComputers robots.
 
-  This program is designed to dig out branches, in a fashion that allows
-  players to easily navigate the dug out tunnels. The primary concern was
-  not the performance of the mining, only a good detection rate, and nice
-  tunnels. Suggested upgrades for this are the geolyzer and inventory
-  controller upgrade, and depending on your world gen (ravines?) a hover
-  upgrade might be necessary. The rest is up to you (chunkloading, more
-  inventory, battery upgrades).
+  Adapted from branching mining program written by Sangar, 2015
 
-  By Sangar, 2015
-
+  This file still needs to be cleaned up
+  
   This program is licensed under the MIT license.
   http://opensource.org/licenses/mit-license.php
 ]]
@@ -480,7 +474,7 @@ local function checkTorches()
 end
 
 -- Recharge our batteries.
-local function recharge()
+local function startRecharge()
   cachedSelect(redstoneSlot)
   robot.down()
   robot.place()
@@ -490,8 +484,10 @@ local function recharge()
   cachedSelect(fluxPointSlot)
   robot.up()
   robot.place()
-  robot.down()
-  
+  robot.down()  
+end
+
+local function endRecharge()
   io.write("Waiting until my batteries are full.\n")
   while computer.maxEnergy() - computer.energy() > 100 do
     os.sleep(1)
@@ -507,7 +503,6 @@ local function recharge()
   robot.up()
   robot.swing()
   robot.down()
-  
 end
 
 -- Go back to the docking bay for general maintenance if necessary.
@@ -550,10 +545,11 @@ local function gotoMaintenance(force)
   pushTurn(right)
   customMove(sides.bottom)
   
+  startRecharge()
   checkTool()
   checkTorches()
   dropMinedBlocks()
-  recharge() -- Last so we can charge some during the other operations above.
+  endRecharge() -- Last so we can charge some during the other operations above.
 
   popMoves() -- get back to the start position
   
