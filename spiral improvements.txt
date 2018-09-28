@@ -7,6 +7,7 @@ BUGS:
 
 - during the maintenance functions that DON'T use the customMove function, if a mob is in the way, the robot will fail to move
 - clean up file / remove unused variables
+- remove need for torches
 
 Notes:
 	Tools MUST have durability. Cannot use electric tools.
